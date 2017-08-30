@@ -12,8 +12,9 @@
 #include <stdbool.h>
 #include <string.h>
 #include "W25Q64.h"
-
+#define WRITEDATA 128
 #define SPI_CHANNEL 0 // /dev/spidev0.0
+
 //#define SPI_CHANNEL 1 // /dev/spidev0.1
 
 //
@@ -65,7 +66,7 @@ void dump(uint8_t *dt, uint32_t n) {
 
 void main() {
     uint8_t buf[256];     // 取得データ
-    uint8_t wdata[16];    // 書込みデータ
+    uint8_t wdata[128];    // 書込みデータ
     uint8_t i;
     
     uint16_t n;           // 取得データ数
@@ -120,35 +121,69 @@ void main() {
     n =  W25Q64_read (0, buf, 256);
     dump(buf,256);
  
-    // データ書き込みテスト
-    // Write data to Sector=0 Address=10
-    for (i=0; i < 26;i++) {
-      wdata[i]='A'+i; // A-Z     
-    }  
-    n =  W25Q64_pageWrite(0, 10, wdata, 26);
-    printf("page_write(0,10,d,26): n=%d\n",n);
+// READ a 8MB BINARY FILE AND WRITE
+	FILE *fp;
+	int  nVal;
+	fp = fopen("/home/pi/K56CM.BIN", "r"); //FILE PATH
+int shanqui = 1;
+int alli = 1;
+for(alli = 1;alli<=2048;alli++){
+    n = W25Q64_eraseSector(alli-1,true);
+    printf("Erase Sector(%d): n=%d\n",alli-1,n);
+
+
+
+
+    for(shanqui = 1;shanqui<=32;shanqui++){
+	int seciii = 1;
+	for(seciii = 1;seciii <= 128;seciii++){
+	    nVal = 0;
+	    fread(&nVal, 1, 1, fp);
+            fseek(fp,(((alli*4096)+(shanqui*128)-128)-4096)+seciii,SEEK_SET);
+            wdata[seciii-1]=nVal;
+	    printf("%02X", wdata[seciii-1]);
+        }
+        n =  W25Q64_pageWrite(alli-1, (shanqui*128)-128, wdata, 128);
+        printf("page_write(%d,%d,d,128): n=%d\n",alli-1,(shanqui*128)-128,n);
+// --READ a 8MB BINARY FILE AND WRITE	
+
 
     // データの読み込み(アドレス0から256バイト取得)
     // Read 256 byte data from Address=0
     memset(buf,0,256);
-    n =  W25Q64_read(0, buf, 256);
-    printf("Read Data: n=%d\n",n);
+    n =  W25Q64_read( (((alli*4096)+(shanqui*128)-128)-4096), buf, 128);
+    printf("Read Data From %d: n=%d\n",(((alli*4096)+(shanqui*128)-128)-4096),n);
     dump(buf,256);
 
-    // データ書き込みテスト
-    // Write data to Sector=0 Address=0
-    for (i=0; i < 10;i++) {
-      wdata[i]='0'+i; // 0-9     
-    }  
-    n =  W25Q64_pageWrite(0, 0, wdata, 10);
-    printf("page_write(0,0,d,10): n=%d\n",n);
+
+    }
+
+
+}
+close(fp);
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
     // 高速データの読み込み(アドレス0から256バイト取得)
     // First read 256 byte data from Address=0
-    memset(buf,0,256);
-    n =  W25Q64_fastread(0,buf, 256);
-    printf("Fast Read Data: n=%d\n",n);
-    dump(buf,256);
+    //memset(buf,0,256);
+    //n =  W25Q64_fastread(0,buf, 256);
+    //printf("Fast Read Data: n=%d\n",n);
+    //dump(buf,256);
 
     // ステータスレジスタ1の取得
     // Get fron Status Register1
