@@ -1,3 +1,17 @@
+# Raspberry-W25Q64-Write-Binary
+
+I just want to repair a laptop BIOS so I modify this program.
+
+Forked from here: https://github.com/nopnop2002/Raspberry-W25Q64
+Modified for write a 8MB Binary files.
+Just git clone https://github.com/liyafe1997/Raspberry-W25Q64-Write-Binary.git
+And modify your binary file path in main.c
+make
+sudo ./main
+The file will write into your W25Q64.
+More information please visit my blog:https://www.liyanfeng.com/post/117.html (Chinese)
+
+---
 # Raspberry-W25Q64
 
 SPI Flash Memory W25Q64 Access Library for RaspberryPi  
