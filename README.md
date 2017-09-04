@@ -9,7 +9,7 @@ And modify your binary file path in main.c
 make   
 sudo ./main   
 The file will write into your W25Q64.   
-More information please visit my blog:https://www.liyanfeng.com/post/117.html (Chinese)   
+More information please visit my blog: https://www.liyanfeng.com/post/118.html (Chinese)   
    
 ---
 
